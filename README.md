@@ -322,9 +322,10 @@ OneLake Explorer is a Windows application that lets you browse and interact with
 
 ### 2.1 Download and Install
 
-1. Open the [OneLake file explorer download page](https://aka.ms/OneLakeExplorer) (or search for "Microsoft OneLake" in the **Microsoft Store**). For setup details, see the [official OneLake file explorer documentation (FR)](https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer).
+1. Open the [OneLake file explorer download page](https://aka.ms/OneLakeExplorer) (or search for "Microsoft OneLake" in the **Microsoft Store**).
 2. Download and install the application.
 3. After installation, OneLake file explorer will appear in the system tray (bottom-right of the taskbar).
+4. For setup details, see the [official OneLake file explorer documentation (FR)](https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer).
 
 ### 2.2 Sign In
 
