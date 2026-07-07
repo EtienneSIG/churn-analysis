@@ -41,7 +41,7 @@ OneLake is the unified storage layer underneath all Microsoft Fabric items (Lake
 
 ### Option B — Direct Download
 
-1. Open the [OneLake file explorer documentation page](https://learn.microsoft.com/fabric/onelake/onelake-file-explorer).
+1. Open the [OneLake file explorer documentation page (FR)](https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer).
 2. Click the download link for the latest version.
 3. Run the installer and follow the prompts.
 
@@ -190,6 +190,6 @@ After completing the workshop, confirm you can:
 
 ## Additional Resources
 
-- [OneLake file explorer official documentation](https://learn.microsoft.com/fabric/onelake/onelake-file-explorer)
+- [OneLake file explorer official documentation (FR)](https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer)
 - [OneLake overview](https://learn.microsoft.com/fabric/onelake/onelake-overview)
 - [Fabric Lakehouse overview](https://learn.microsoft.com/fabric/data-engineering/lakehouse-overview)

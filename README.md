@@ -326,6 +326,8 @@ OneLake Explorer is a Windows application that lets you browse and interact with
 2. Download and install the application.
 3. After installation, OneLake file explorer will appear in the system tray (bottom-right of the taskbar).
 
+For detailed setup and troubleshooting, see [`docs/onelake_explorer_setup.md`](docs/onelake_explorer_setup.md) and the [official OneLake file explorer documentation (FR)](https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer).
+
 ### 2.2 Sign In
 
 1. Click the OneLake icon in the system tray.
@@ -729,6 +731,7 @@ See [`docs/rayfin_optional.md`](docs/rayfin_optional.md) for installation and co
 |---|---|
 | Microsoft Fabric home | [https://app.fabric.microsoft.com](https://app.fabric.microsoft.com) |
 | OneLake file explorer | [https://aka.ms/OneLakeExplorer](https://aka.ms/OneLakeExplorer) |
+| OneLake file explorer documentation (FR) | [https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer](https://learn.microsoft.com/fr-fr/fabric/onelake/onelake-file-explorer) |
 | Load data into Fabric Lakehouse notebooks | [https://learn.microsoft.com/fabric/data-engineering/lakehouse-notebook-load-data](https://learn.microsoft.com/fabric/data-engineering/lakehouse-notebook-load-data) |
 | Microsoft Fabric churn prediction tutorial | [https://learn.microsoft.com/fabric/data-science/customer-churn](https://learn.microsoft.com/fabric/data-science/customer-churn) |
 | Fabric Data Agent documentation | [https://learn.microsoft.com/fabric/data-science/data-agent-overview](https://learn.microsoft.com/fabric/data-science/data-agent-overview) |
