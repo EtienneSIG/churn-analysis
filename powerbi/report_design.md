@@ -165,7 +165,9 @@ Apply this to bar charts and matrix visuals for immediate visual signal.
 - Canvas size: 16:9 (1280×720)
 - Font: Segoe UI
 - Show gridlines: Off
-- Theme: Apply a custom theme JSON if needed, or use "Accessible city park" as a clean starter.
+- Theme: Apply the custom **Contoso Banque** theme — see [`powerbi/contoso_banque_theme.json`](contoso_banque_theme.json).
+  - In Power BI Desktop: **View** → **Themes** → **Browse for themes** → select `contoso_banque_theme.json`.
+  - In the Fabric report editor: **Format** → **Theme** → **Upload theme**.
 
 ---
 

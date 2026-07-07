@@ -1,0 +1,134 @@
+name: Validate Repository
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate:
+    name: Validate notebooks, SQL, and JSON assets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate notebook JSON structure
+        run: |
+          python - <<'EOF'
+          import nbformat, glob, sys
+
+          notebooks = glob.glob("notebooks/*.ipynb")
+          if not notebooks:
+              print("No notebooks found — skipping.")
+              sys.exit(0)
+
+          errors = []
+          for path in sorted(notebooks):
+              try:
+                  with open(path) as f:
+                      nb = nbformat.read(f, as_version=4)
+                  nbformat.validate(nb)
+                  print(f"  ✅ {path}")
+              except nbformat.ValidationError as e:
+                  errors.append(f"  ❌ {path}: {e}")
+              except Exception as e:
+                  errors.append(f"  ❌ {path}: {e}")
+
+          if errors:
+              print("\nNotebook validation FAILED:")
+              for e in errors:
+                  print(e)
+              sys.exit(1)
+          else:
+              print(f"\nAll {len(notebooks)} notebook(s) are valid.")
+          EOF
+
+      - name: Validate JSON assets
+        run: |
+          python - <<'EOF'
+          import json, glob, sys
+
+          json_files = glob.glob("powerbi/*.json") + glob.glob("data/*.json")
+          if not json_files:
+              print("No JSON files found — skipping.")
+              sys.exit(0)
+
+          errors = []
+          for path in sorted(json_files):
+              try:
+                  with open(path) as f:
+                      json.load(f)
+                  print(f"  ✅ {path}")
+              except json.JSONDecodeError as e:
+                  errors.append(f"  ❌ {path}: {e}")
+
+          if errors:
+              print("\nJSON validation FAILED:")
+              for e in errors:
+                  print(e)
+              sys.exit(1)
+          else:
+              print(f"\nAll {len(json_files)} JSON file(s) are valid.")
+          EOF
+
+      - name: Check SQL files are non-empty
+        run: |
+          python - <<'EOF'
+          import glob, os, sys
+
+          sql_files = glob.glob("sql/*.sql")
+          if not sql_files:
+              print("No SQL files found — skipping.")
+              sys.exit(0)
+
+          errors = []
+          for path in sorted(sql_files):
+              size = os.path.getsize(path)
+              if size == 0:
+                  errors.append(f"  ❌ {path} is empty")
+              else:
+                  print(f"  ✅ {path} ({size} bytes)")
+
+          if errors:
+              print("\nSQL check FAILED:")
+              for e in errors:
+                  print(e)
+              sys.exit(1)
+          else:
+              print(f"\nAll {len(sql_files)} SQL file(s) are non-empty.")
+          EOF
+
+      - name: Validate sample CSV
+        run: |
+          python - <<'EOF'
+          import csv, sys
+
+          path = "data/sample_customers.csv"
+          try:
+              with open(path, newline="") as f:
+                  reader = csv.DictReader(f)
+                  rows = list(reader)
+              expected_cols = {
+                  "customer_id", "age", "region", "customer_since_date",
+                  "tenure_months", "income_band", "risk_profile",
+                  "digital_active_flag", "churned_90d"
+              }
+              missing = expected_cols - set(reader.fieldnames or [])
+              if missing:
+                  print(f"  ❌ {path}: missing columns: {missing}")
+                  sys.exit(1)
+              print(f"  ✅ {path}: {len(rows)} rows, all expected columns present.")
+          except FileNotFoundError:
+              print(f"  ⚠️  {path} not found — skipping.")
+          EOF

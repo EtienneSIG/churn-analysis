@@ -1,0 +1,15 @@
+# Python dependencies for local development and CI validation
+# All notebook code runs inside Microsoft Fabric (PySpark environment).
+# These packages support local linting, testing, and notebook validation.
+
+# Notebook validation and inspection
+nbformat>=5.9.0
+
+# JSON schema validation
+jsonschema>=4.20.0
+
+# Local data inspection and CSV handling (optional — Fabric uses PySpark)
+pandas>=2.0.0
+
+# Testing
+pytest>=7.4.0

@@ -154,6 +154,7 @@ By the end of this workshop, you will be able to:
 ```
 churn-analysis/
 ├── README.md                          ← This file — the main workshop guide
+├── requirements.txt                   ← Python dependencies for local dev/CI
 │
 ├── notebooks/
 │   ├── 01_generate_and_ingest_banking_data.ipynb   ← Generate synthetic data & write Delta tables
@@ -165,7 +166,8 @@ churn-analysis/
 │   └── 02_descriptive_churn_queries.sql ← Descriptive KPI queries by segment
 │
 ├── powerbi/
-│   └── report_design.md              ← Power BI report design guide (pages, visuals, measures)
+│   ├── report_design.md              ← Power BI report design guide (pages, visuals, measures)
+│   └── contoso_banque_theme.json     ← Custom Power BI theme (colors, fonts, card styles)
 │
 ├── docs/
 │   ├── onelake_explorer_setup.md     ← Detailed OneLake Explorer setup and troubleshooting
@@ -173,10 +175,25 @@ churn-analysis/
 │   └── rayfin_optional.md            ← Optional Rayfin bonus instructions
 │
 ├── data/
-│   └── README.md                     ← Explains the data model and schema
+│   ├── README.md                     ← Explains the data model and schema
+│   └── sample_customers.csv          ← 5-row sample of the customers table (schema reference)
 │
-└── assets/
-    └── README.md                     ← Placeholder for screenshots and diagram assets
+├── assets/
+│   ├── README.md                     ← Asset guide — screenshots and diagram instructions
+│   ├── architecture_diagram.svg      ← Visual end-to-end architecture diagram
+│   ├── 01_workspace_overview.svg     ← Placeholder — replace with real screenshot
+│   ├── 02_lakehouse_tables.svg       ← Placeholder — replace with real screenshot
+│   ├── 03_onelake_explorer.svg       ← Placeholder — replace with real screenshot
+│   ├── 04_notebook_01_run_all.svg    ← Placeholder — replace with real screenshot
+│   ├── 05_notebook_02_run_all.svg    ← Placeholder — replace with real screenshot
+│   ├── 06_sql_endpoint_query.svg     ← Placeholder — replace with real screenshot
+│   ├── 07_powerbi_report.svg         ← Placeholder — replace with real screenshot
+│   ├── 08_data_agent_question.svg    ← Placeholder — replace with real screenshot
+│   └── 09_onelake_raw_files.svg      ← Placeholder — replace with real screenshot
+│
+└── .github/
+    └── workflows/
+        └── validate.yml              ← CI: validates notebooks, JSON assets, SQL files, CSV
 ```
 
 ### Folder Purposes
@@ -233,6 +250,8 @@ churn-analysis/
          └──────────────────────────────────►  Fabric Data Agent
                                                (docs/data_agent_setup.md)
 ```
+
+![Architecture Diagram](assets/architecture_diagram.svg)
 
 ### Files vs Tables — Beginner Explanation
 
