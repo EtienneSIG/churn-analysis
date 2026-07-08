@@ -17,13 +17,14 @@
 8. [Step 1 — Create the Fabric Workspace and Lakehouse](#step-1--create-the-fabric-workspace-and-lakehouse)
 9. [Step 2 — Install and Configure OneLake Explorer](#step-2--install-and-configure-onelake-explorer)
 10. [Step 3 — Explore OneLake Navigation](#step-3--explore-onelake-navigation)
-11. [Step 4 — Generate Synthetic Banking Data](#step-4--generate-synthetic-banking-data)
-12. [Step 5 — Transform, Segment, and Analyze Churn](#step-5--transform-segment-and-analyze-churn)
-13. [Step 6 — SQL Analytics Endpoint](#step-6--sql-analytics-endpoint)
-14. [Step 7 — Power BI Visualization](#step-7--power-bi-visualization)
-15. [Step 8 — Fabric Data Agent](#step-8--fabric-data-agent)
-16. [Step 9 — Optional: Rayfin Bonus](#step-9--optional-rayfin-bonus)
-17. [Reference Links](#reference-links)
+11. [Step 3.4 — Upload Custom Segmentation CSV](#step-34--upload-custom-segmentation-csv)
+12. [Step 4 — Generate Synthetic Banking Data](#step-4--generate-synthetic-banking-data)
+13. [Step 5 — Transform, Segment, and Analyze Churn](#step-5--transform-segment-and-analyze-churn)
+14. [Step 6 — SQL Analytics Endpoint](#step-6--sql-analytics-endpoint)
+15. [Step 7 — Power BI Visualization](#step-7--power-bi-visualization)
+16. [Step 8 — Fabric Data Agent](#step-8--fabric-data-agent)
+17. [Step 9 — Optional: Rayfin Bonus](#step-9--optional-rayfin-bonus)
+18. [Reference Links](#reference-links)
 
 ---
 
@@ -89,6 +90,7 @@ By the end of this workshop, you will be able to:
 
 - [ ] Navigate OneLake and understand the difference between **Files** and **Tables**.
 - [ ] Use **OneLake Explorer** to inspect Fabric data directly in Windows File Explorer.
+- [ ] **Upload a CSV file** to a Lakehouse via OneLake Explorer and register it as a Delta table using "Load to Tables".
 - [ ] Use a **Fabric Notebook** with PySpark to generate and ingest data into a Lakehouse.
 - [ ] Save **Delta tables** to a Fabric Lakehouse.
 - [ ] Transform raw banking data into customer-level analytical features.
@@ -139,12 +141,13 @@ By the end of this workshop, you will be able to:
 | 1 | Setup | Create Fabric workspace and Lakehouse | 15 min | `ChurnAnalysisLH` Lakehouse exists |
 | 2 | OneLake Explorer | Install, configure, and explore OneLake | 20 min | Workspace visible in Windows File Explorer |
 | 3 | OneLake Navigation | Understand Files vs Tables, mini exercise | 10 min | `hello-onelake.txt` visible in Fabric |
+| 3.4 | Custom Segmentation | Upload CSV via OneLake Explorer, load as Delta table | 10 min | `customer_custom_segment` table in Lakehouse |
 | 4 | Data Generation | Run notebook 01 — generate and ingest synthetic data | 30 min | 5 raw Delta tables in Lakehouse |
 | 5 | Transformation | Run notebook 02 — build `customer_360` and `churn_by_segment` | 25 min | 2 curated analytical tables |
-| 6 | SQL Analytics | Write and run descriptive SQL queries | 15 min | Query results confirming churn KPIs |
+| 6 | SQL Analytics | Write and run descriptive SQL queries + custom segment cross-analysis | 20 min | Query results confirming churn KPIs by segment |
 | 7 | Power BI | Build report from Lakehouse data | 25 min | Interactive churn dashboard |
-| 8 | Data Agent | Configure agent, ask 5 business questions | 20 min | Natural-language answers from data |
-| — | **Total core** | | **~2h 40min** | |
+| 8 | Data Agent | Configure agent, ask 5+ business questions incl. custom segments | 20 min | Natural-language answers from data |
+| — | **Total core** | | **~2h 55min** | |
 | 9 | Rayfin (bonus) | Explore Rayfin as advanced AI layer | 30–45 min | Rayfin connected to Lakehouse (optional) |
 
 ---
@@ -163,7 +166,8 @@ churn-analysis/
 │
 ├── sql/
 │   ├── 01_customer_churn_views.sql    ← Create SQL views for churn analysis
-│   └── 02_descriptive_churn_queries.sql ← Descriptive KPI queries by segment
+│   ├── 02_descriptive_churn_queries.sql ← Descriptive KPI queries by segment
+│   └── 03_custom_segment_queries.sql  ← Cross-analysis with custom segmentation table
 │
 ├── powerbi/
 │   ├── report_design.md              ← Power BI report design guide (pages, visuals, measures)
@@ -176,7 +180,7 @@ churn-analysis/
 │
 ├── data/
 │   ├── README.md                     ← Explains the data model and schema
-│   └── sample_customers.csv          ← 5-row sample of the customers table (schema reference)
+│   └── customer_custom_segment.csv   ← Custom business segmentation (10,000 rows — upload via OneLake Explorer)
 │
 ├── assets/
 │   ├── README.md                     ← Asset guide — screenshots and diagram instructions
@@ -238,7 +242,8 @@ churn-analysis/
 │    ├── customer_products                │
 │    ├── transactions                     │
 │    ├── customer_360     ◄── notebook 02 │
-│    └── churn_by_segment ◄── notebook 02 │
+│    ├── churn_by_segment ◄── notebook 02 │
+│    └── customer_custom_segment ◄── OneLake Explorer upload │
 └────────┬─────────────────────────────────┘
          │
          ├──────────────────────────────────►  SQL Analytics Endpoint
@@ -418,6 +423,50 @@ This exercise verifies that your OneLake Explorer connection is working correctl
 8. Delete the file from the Fabric portal (right-click → Delete) to keep things clean.
 
 > **Note:** Writing directly to `Tables/` from your local machine is not recommended. Always use Spark (notebook) to write Delta tables.
+
+---
+
+## Step 3.4 — Upload Custom Segmentation CSV
+
+> 📄 **Full instructions:** [`docs/onelake_explorer_setup.md`](docs/onelake_explorer_setup.md#uploading-a-custom-segmentation-file)
+> 📂 **File to upload:** [`data/customer_custom_segment.csv`](data/customer_custom_segment.csv)
+
+This step shows how to use OneLake Explorer to upload an **external enrichment file** and register it as a Delta table — all without writing a single line of code.
+
+The file `data/customer_custom_segment.csv` provides a custom business segmentation for all 10,000 synthetic customers:
+
+| Segment | Description | ~Count |
+|---|---|---|
+| `VIP` | High-value customers prioritised for premium service | 990 |
+| `Loyal` | Long-standing customers with stable engagement | 3,000 |
+| `At Risk` | Customers flagged by the business team as potentially churning | 1,960 |
+| `New Joiner` | Recently acquired customers | 1,580 |
+| `Dormant` | Customers with very low or no recent activity | 2,460 |
+
+### 3.4.1 Download and Upload
+
+1. Download `data/customer_custom_segment.csv` from this repository to your local machine.
+2. In Windows File Explorer, navigate to `ChurnAnalysisLH.Lakehouse / Files /`.
+3. Create a sub-folder named `upload` inside `Files/`.
+4. **Drag and drop** `customer_custom_segment.csv` into `Files/upload/`.
+5. Wait for the sync icon to stop spinning, then verify in the Fabric portal that the file appears.
+
+### 3.4.2 Load as a Delta Table
+
+1. In the Fabric portal Lakehouse view, go to `Files / upload /`.
+2. Right-click `customer_custom_segment.csv` → **Load to Tables** → **New table**.
+3. Set the table name to `customer_custom_segment`, confirm headers are detected, and click **Load**.
+4. Wait 30–60 seconds. Refresh **Tables** — `customer_custom_segment` should appear.
+
+### 3.4.3 Quick Validation
+
+In the SQL analytics endpoint:
+```sql
+SELECT COUNT(*) AS total_rows FROM customer_custom_segment;
+```
+Expected: 10,000.
+
+> **When to do this step:** The upload can be done at any point in the workshop. The join queries that cross-reference this table with `customer_360` are in Step 6.
 
 ---
 
@@ -618,12 +667,23 @@ Example queries include:
 - Churn rate by income band and digital activity
 - Top 10 merchant categories for churned vs. retained customers
 
-### 6.4 Validate
+### 6.4 Cross-Analyse with Custom Segmentation
+
+After completing Step 3.4 (uploading `customer_custom_segment`), run the queries from [`sql/03_custom_segment_queries.sql`](sql/03_custom_segment_queries.sql) to cross-reference the business-defined segments with the analytical data.
+
+Key queries include:
+- Churn rate by custom segment (JOIN `customer_custom_segment` with `customer_360`)
+- Custom segment × activity tier cross-tab
+- Full profile card per custom segment
+- Churn delta vs. baseline for each segment
+
+### 6.5 Validate
 
 **Expected output:**
 - Inactive customers show the highest churn rate (> 40%).
 - Single-product customers show materially higher churn than multi-product customers.
 - Digitally inactive customers show higher churn than digitally active customers.
+- The custom segment cross-analysis reveals which business-defined groups overlap most with high-churn internal segments.
 
 ---
 
@@ -634,7 +694,7 @@ Example queries include:
 ### 7.1 Create a Semantic Model
 
 1. In your Lakehouse, click the **New semantic model** button.
-2. Select these tables to include: `customer_360`, `churn_by_segment`, `customers`, `accounts`.
+2. Select these tables to include: `customer_360`, `churn_by_segment`, `customers`, `accounts`, `customer_custom_segment`.
 3. Click **Confirm** — Fabric will auto-generate the semantic model.
 
 ### 7.2 Open Power BI Report Builder
@@ -651,10 +711,12 @@ Example queries include:
 | Bar chart | Churn rate by activity tier | Identify most at-risk activity segment |
 | Bar chart | Churn rate by balance band | Balance vs. churn relationship |
 | Bar chart | Churn rate by product count tier | Product depth impact |
+| Bar chart | Churn rate by custom segment | Business segment overlay |
 | Scatter plot | Avg balance vs. churn rate by segment | Quadrant analysis |
 | Table | Top segments by churn rate | Detailed drill-through |
 | Slicer | Income band | Filter for specific customer groups |
 | Slicer | Region | Geographic filter |
+| Slicer | Custom segment | Filter by business-defined segment |
 
 ### 7.4 Publish
 
@@ -679,7 +741,7 @@ A **Fabric Data Agent** lets users ask questions about data in plain English, an
 
 1. In the Data Agent configuration panel, click **+ Add data source**.
 2. Select **Lakehouse** → choose `ChurnAnalysisLH`.
-3. Select the tables to include: `customer_360`, `churn_by_segment`, `customers`, `accounts`.
+3. Select the tables to include: `customer_360`, `churn_by_segment`, `customers`, `accounts`, `customer_custom_segment`.
 4. Click **Save**.
 
 ### 8.3 Add Business Context Instructions
@@ -692,6 +754,9 @@ The data contains synthetic customer records for a churn analysis workshop.
 - 'churned_90d' = 1 means the customer is flagged as churned in the last 90 days.
 - 'activity_tier' groups customers by transaction frequency.
 - 'balance_band' groups customers by average balance.
+- 'custom_segment' is a business label from customer_custom_segment table:
+    "VIP", "Loyal", "At Risk", "New Joiner", "Dormant".
+  To use it, JOIN customer_custom_segment ON customer_id with customer_360.
 - All figures are in EUR. All data is fictional and used for learning purposes only.
 ```
 
@@ -704,12 +769,15 @@ Use the sample questions from [`notebooks/03_data_agent_validation_questions.md`
 3. *"How many customers are single-product holders, and what is their churn rate?"*
 4. *"Show me the top 3 segments by churn rate."*
 5. *"What is the average balance of churned customers compared to retained customers?"*
+6. *"What is the churn rate for each custom segment?"*
+7. *"Which custom segment has the most 'At Risk' customers with an inactive activity tier?"*
 
 ### 8.5 Validate
 
 **Expected behavior:**
 - The agent returns a SQL query it generated, plus the answer.
 - Results align with what you saw in your Power BI report and SQL queries.
+- For custom segment questions, the agent correctly JOINs `customer_custom_segment` with `customer_360` on `customer_id`.
 
 ---
 

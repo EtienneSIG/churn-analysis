@@ -156,6 +156,31 @@ Aggregated churn KPIs grouped by segment.
 
 ---
 
+### `customer_custom_segment`
+
+External custom segmentation provided as a CSV file (`data/customer_custom_segment.csv`). One row per customer. This file is uploaded to OneLake via OneLake Explorer and registered as a Delta table in Step 3 of the workshop.
+
+It represents the kind of enrichment data a business analyst or CRM team might prepare outside the main data pipeline — for example, from a marketing system or manual classification exercise.
+
+| Column | Type | Description |
+|---|---|---|
+| `customer_id` | STRING | Foreign key → `customers.customer_id` |
+| `custom_segment` | STRING | Business-defined segment: `"VIP"`, `"Loyal"`, `"At Risk"`, `"New Joiner"`, `"Dormant"` |
+
+**Segment definitions:**
+
+| Value | Description |
+|---|---|
+| `VIP` | High-value customers prioritised for premium service (~10% of customers) |
+| `Loyal` | Long-standing customers with stable engagement (~30%) |
+| `At Risk` | Customers flagged by the business team as potentially churning (~20%) |
+| `New Joiner` | Customers who joined recently (~15%) |
+| `Dormant` | Customers with very low or no recent activity (~25%) |
+
+> **Note:** This segmentation is synthetic and randomly assigned (seed 42) — it does not derive from the actual balance, activity, or churn data. It is designed to illustrate how an external segmentation enriches the existing analytical tables when joined on `customer_id`.
+
+---
+
 ## Churn Label Generation Logic
 
 The `churned_90d` flag is generated in `notebooks/01_generate_and_ingest_banking_data.ipynb` using the following business heuristics:
