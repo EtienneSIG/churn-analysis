@@ -717,12 +717,37 @@ Key queries include:
 2. Select these tables to include: `customer_360`, `churn_by_segment`, `customers`, `accounts`, `customer_custom_segment`.
 3. Click **Confirm** — Fabric will auto-generate the semantic model.
 
-### 7.2 Open Power BI Report Builder
+### 7.2 Define Relationships Between Tables
+
+When Fabric generates the semantic model it auto-detects **some** relationships, but you should open the **model view** and verify (or create) them so that cross-table filtering, slicers, and the Data Agent joins all work correctly.
+
+1. Open the semantic model and switch to the **Model** view (the diagram/layout view) — each table appears as a card listing its columns.
+2. To create a relationship, **drag a key column from one table onto the matching key column of the other**, or use **Home → Manage relationships → + New relationship**.
+3. Create the following relationships:
+
+| From (many side) | Column | To (one side) | Column | Cardinality | Cross-filter |
+|---|---|---|---|---|---|
+| `accounts` | `customer_id` | `customers` | `customer_id` | Many-to-one (\*:1) | Single |
+| `customer_products` | `customer_id` | `customers` | `customer_id` | Many-to-one (\*:1) | Single |
+| `customer_products` | `product_id` | `products` | `product_id` | Many-to-one (\*:1) | Single |
+| `transactions` | `account_id` | `accounts` | `account_id` | Many-to-one (\*:1) | Single |
+| `transactions` | `customer_id` | `customers` | `customer_id` | Many-to-one (\*:1) | Single — keep **inactive** (see note) |
+| `customer_360` | `customer_id` | `customers` | `customer_id` | One-to-one (1:1) | Both |
+| `customer_custom_segment` | `customer_id` | `customers` | `customer_id` | One-to-one (1:1) | Both |
+
+4. For each relationship, confirm the **cardinality** and **cross-filter direction** in the dialog, then click **OK / Save**.
+
+> **Notes:**
+> - `churn_by_segment` is a **pre-aggregated summary table** with no shared key — leave it **standalone** and use it directly for segment KPI visuals.
+> - The `transactions → customers` link is redundant with the `transactions → accounts → customers` path. Keep only one **active** path to avoid an ambiguous filter; Power BI marks the extra relationship **inactive** (dashed line) — that is expected.
+> - Once relationships exist, a slicer on `customers` (e.g., `region`, `income_band`) or on `customer_custom_segment` (`custom_segment`) will correctly filter visuals built on `customer_360`, `accounts`, and `transactions`.
+
+### 7.3 Open Power BI Report Builder
 
 1. From the semantic model, click **Create a report** → **Auto-create report** (to get a starting point) or **Blank report** (to build from scratch).
 2. Follow the guide in [`powerbi/report_design.md`](powerbi/report_design.md) for the recommended page layouts and visuals.
 
-### 7.3 Key Visuals to Build
+### 7.4 Key Visuals to Build
 
 | Visual | Data | Purpose |
 |---|---|---|
@@ -738,7 +763,7 @@ Key queries include:
 | Slicer | Region | Geographic filter |
 | Slicer | Custom segment | Filter by business-defined segment |
 
-### 7.4 Publish
+### 7.5 Publish
 
 When your report is ready, save it. It is automatically published to your Fabric workspace.
 
