@@ -735,7 +735,7 @@ When Fabric generates the semantic model it auto-detects **some** relationships,
 | `transactions` | `account_id` | `accounts` | `account_id` | Many-to-one (\*:1) | Single |
 | `transactions` | `customer_id` | `customers` | `customer_id` | Many-to-one (\*:1) | Single — keep **inactive** (see note) |
 | `customer_360` | `customer_id` | `customers` | `customer_id` | One-to-one (1:1) | Both |
-| `customer_custom_segment` | `customer_id` | `customers` | `customer_id` | One-to-one (1:1) | Both |
+| `customer_custom_segment` | `customer_id` | `customer_360` | `customer_id` | One-to-one (1:1) | Both |
 
 4. For each relationship, confirm the **cardinality** and **cross-filter direction** in the dialog, then click **OK / Save**.
 
