@@ -132,6 +132,107 @@ To upload a local file to a Lakehouse's `Files/` section:
 
 ---
 
+## Uploading a Custom Segmentation File
+
+The workshop provides a pre-built CSV (`data/customer_custom_segment.csv`) that maps each of the 10,000 synthetic customers to a business-defined segment: **VIP**, **Loyal**, **At Risk**, **New Joiner**, or **Dormant**.
+
+This file represents the kind of external enrichment data a CRM team or business analyst might prepare outside the main data pipeline. The goal of this exercise is to demonstrate two things:
+
+1. How to **upload a local file to a Fabric Lakehouse** using OneLake Explorer (drag and drop).
+2. How to **register a CSV as a Delta table** using the Fabric portal's "Load to Tables" feature — no code required.
+
+Once registered, the table can be joined with `customer_360` and queried in the SQL analytics endpoint, Power BI, and the Fabric Data Agent.
+
+---
+
+### Step A — Download the CSV
+
+Download `data/customer_custom_segment.csv` from this repository to your local machine.
+
+The file has two columns:
+
+| Column | Type | Description |
+|---|---|---|
+| `customer_id` | STRING | Matches `customers.customer_id` (e.g., `CUST-00001`) |
+| `custom_segment` | STRING | `"VIP"`, `"Loyal"`, `"At Risk"`, `"New Joiner"`, or `"Dormant"` |
+
+---
+
+### Step B — Upload the CSV via OneLake Explorer
+
+1. In Windows File Explorer, navigate to:
+   ```
+   OneLake - Microsoft
+   └── ChurnAnalysis-Workshop
+       └── ChurnAnalysisLH.Lakehouse
+           └── Files
+   ```
+2. Inside `Files/`, create a sub-folder called `upload` (right-click → New → Folder, then name it `upload`).
+3. **Drag and drop** `customer_custom_segment.csv` from your local machine into the `Files/upload/` folder.
+4. Wait for the sync indicator on the file to stop spinning — a static cloud or check-mark icon means the upload is complete.
+5. Verify in the [Fabric portal](https://app.fabric.microsoft.com): navigate to your Lakehouse → **Files** → `upload` → confirm `customer_custom_segment.csv` appears.
+
+> **Tip:** If the file does not appear immediately in the Fabric portal, right-click the Lakehouse folder in OneLake Explorer and select **Sync from OneLake**, then refresh the browser.
+
+---
+
+### Step C — Load the CSV as a Delta Table
+
+Once the CSV is in `Files/`, use the Fabric portal to convert it into a queryable Delta table with no code:
+
+1. In the Lakehouse **Files** tree, navigate to `Files / upload /`.
+2. Right-click on `customer_custom_segment.csv`.
+3. Select **Load to Tables** → **New table**.
+4. In the dialog:
+   - **Table name:** `customer_custom_segment`
+   - **First row contains column names:** ✅ (should be checked automatically)
+   - Confirm the detected column types look correct (`customer_id` = string, `custom_segment` = string).
+5. Click **Load**.
+6. Wait 30–60 seconds for the job to complete (a progress indicator appears at the top of the page).
+7. Refresh the **Tables** section of the Lakehouse — `customer_custom_segment` should now appear alongside the other tables.
+
+> **Why "Load to Tables" instead of a Spark notebook?**
+> The "Load to Tables" shortcut is built into Fabric for flat, simple CSV files. Fabric reads the CSV and writes it as a versioned Delta table automatically. For more complex transformations or multi-source joins, always use a Spark notebook.
+
+---
+
+### Step D — Validate the Table
+
+In the **SQL analytics endpoint** of your Lakehouse, run these two quick queries:
+
+```sql
+-- Confirm row count — should be 10,000
+SELECT COUNT(*) AS total_rows FROM customer_custom_segment;
+
+-- Check segment distribution
+SELECT custom_segment, COUNT(*) AS customer_count
+FROM customer_custom_segment
+GROUP BY custom_segment
+ORDER BY customer_count DESC;
+```
+
+Expected:
+
+| `custom_segment` | Approximate count |
+|---|---|
+| Loyal | ~3,000 |
+| Dormant | ~2,460 |
+| At Risk | ~1,960 |
+| New Joiner | ~1,580 |
+| VIP | ~990 |
+
+---
+
+### Custom Segmentation Validation Checklist
+
+- [ ] `customer_custom_segment.csv` is visible in `Files/upload/` in the Fabric portal.
+- [ ] `customer_custom_segment` table appears in the **Tables** section.
+- [ ] `SELECT COUNT(*) FROM customer_custom_segment` returns 10,000.
+- [ ] Segment distribution matches the expected values above.
+- [ ] `customer_custom_segment` is available in the SQL analytics endpoint query editor.
+
+---
+
 ## Troubleshooting
 
 ### Workspace Not Visible
@@ -183,7 +284,9 @@ After completing the workshop, confirm you can:
 - [ ] See `ChurnAnalysis-Workshop` in the OneLake folder.
 - [ ] See `ChurnAnalysisLH.Lakehouse` inside the workspace.
 - [ ] Navigate to `Files/churn/raw/customers/` and see Parquet files.
+- [ ] Navigate to `Files/upload/` and see `customer_custom_segment.csv`.
 - [ ] Navigate to `Tables/customer_360/` and see Delta files (`_delta_log/`, `.parquet` files).
+- [ ] Navigate to `Tables/customer_custom_segment/` and see Delta files.
 - [ ] Right-click and sync without errors.
 
 ---

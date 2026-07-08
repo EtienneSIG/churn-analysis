@@ -57,6 +57,7 @@ Before starting:
    - [x] `churn_by_segment`
    - [x] `customers`
    - [x] `accounts`
+   - [x] `customer_custom_segment`
    - [ ] `transactions` (optional — adds query complexity; include if you want transaction-level questions)
 6. Click **Confirm** or **Save**.
 
@@ -84,6 +85,13 @@ KEY DEFINITIONS:
 - 'product_count_tier' groups by number of active products:
     "Multi-product" (≥3), "Dual" (2), "Single" (1), "No product" (0).
 - 'digital_active_flag' = 1 means the customer uses digital banking channels.
+- 'custom_segment' is a business-defined label from an external CRM segmentation:
+    "VIP" = high-value customers prioritised for premium service.
+    "Loyal" = long-standing customers with stable engagement.
+    "At Risk" = customers flagged by the business team as potentially churning.
+    "New Joiner" = recently acquired customers.
+    "Dormant" = customers with very low or no recent activity.
+  To use it, JOIN customer_custom_segment ON customer_id with customer_360 or customers.
 
 IMPORTANT:
 - All data is synthetic and fictional, used for a learning workshop.
@@ -141,6 +149,20 @@ Switch to the **Chat** tab in the Data Agent editor and test the following quest
 
 10. **"What are the top 3 segments I should focus on to reduce churn?"**
     - Expected: Inactive customers, single-product customers, declining balance customers
+
+### Custom Segment Questions
+
+11. **"What is the churn rate for each custom segment?"**
+    - Expected: A table with 5 rows (VIP, Loyal, At Risk, New Joiner, Dormant) and their respective churn rates
+
+12. **"Which custom segment has the highest churn rate?"**
+    - Expected: One of the segments — compare with your SQL results from `sql/03_custom_segment_queries.sql`
+
+13. **"How many 'At Risk' customers are in the dataset and what is their churn rate?"**
+    - Expected: ~1,960 customers; the agent should JOIN `customer_custom_segment` with `customer_360`
+
+14. **"Compare the average balance of VIP customers vs. Dormant customers."**
+    - Expected: The agent joins both tables on `customer_id` and groups by `custom_segment`
 
 ### Validation Questions (from `notebooks/03_data_agent_validation_questions.md`)
 
