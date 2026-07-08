@@ -317,6 +317,10 @@ You should now see the Lakehouse page with an empty **Files** section and an emp
 - Both notebooks show `ChurnAnalysisLH` in their Explorer pane.
 - The Lakehouse has empty Files and Tables sections.
 
+> 📸 **Live run — workspace overview.** The `ChurnAnalysis-Workshop` workspace on the `sales` capacity, showing the Lakehouse, both notebooks, the semantic model, and the Data Agent created during this workshop.
+>
+> ![Workspace overview](assets/01_workspace_overview.png)
+
 ---
 
 ## Step 2 — Install and Configure OneLake Explorer
@@ -564,6 +568,14 @@ spark.sql("SELECT COUNT(*) AS total_customers FROM customers").show()
 2. Right-click → **Sync from OneLake**.
 3. Confirm `Files/churn/raw/customers/` is visible.
 
+> 📸 **Live run — notebook 01 complete.** After **Run all**, the final cell confirms the generated volumes: 10,000 customers, 15,538 accounts, 10 products, 23,224 customer-products, and 196,172 transactions, with an overall churn rate of **23.32%**.
+>
+> ![Notebook 01 Run All complete](assets/04_notebook_01_run_all.png)
+>
+> The five raw Delta tables then appear in the Lakehouse **Tables** section:
+>
+> ![Lakehouse tables](assets/02_lakehouse_tables.png)
+
 ---
 
 ## Step 5 — Transform, Segment, and Analyze Churn
@@ -625,6 +637,10 @@ After running the notebook, `churn_by_segment` contains:
 1. Click **Run all**.
 2. After completion, verify that `customer_360` and `churn_by_segment` appear in `Tables/`.
 
+> 📸 **Live run — notebook 02 complete.** The transformation notebook builds the curated `customer_360` and `churn_by_segment` tables after a successful **Run all**.
+>
+> ![Notebook 02 Run All complete](assets/05_notebook_02_run_all.png)
+
 ---
 
 ## Step 6 — SQL Analytics Endpoint
@@ -685,6 +701,10 @@ Key queries include:
 - Digitally inactive customers show higher churn than digitally active customers.
 - The custom segment cross-analysis reveals which business-defined groups overlap most with high-churn internal segments.
 
+> 📸 **Live run — SQL analytics endpoint.** A descriptive churn query executed against the auto-provisioned SQL endpoint of `ChurnAnalysisLH`, returning churn KPIs by segment.
+>
+> ![SQL analytics endpoint query](assets/06_sql_endpoint_query.png)
+
 ---
 
 ## Step 7 — Power BI Visualization
@@ -721,6 +741,12 @@ Key queries include:
 ### 7.4 Publish
 
 When your report is ready, save it. It is automatically published to your Fabric workspace.
+
+> 📸 **Live run — churn visualization.** A matrix built from `churn_by_segment` breaking down `churn_rate_pct`, `total_customers`, and `churned_customers` across each segmentation dimension.
+>
+> ![Power BI churn report](assets/07_powerbi_report.png)
+>
+> ℹ️ **Note:** If your account has only a Power BI Pro/PPU-free profile, **Create report / Auto-create** may be disabled. In that case use **Explore this data** on the semantic model (as shown above) to build the same visuals interactively.
 
 ---
 
@@ -778,6 +804,10 @@ Use the sample questions from [`notebooks/03_data_agent_validation_questions.md`
 - The agent returns a SQL query it generated, plus the answer.
 - Results align with what you saw in your Power BI report and SQL queries.
 - For custom segment questions, the agent correctly JOINs `customer_custom_segment` with `customer_360` on `customer_id`.
+
+> 📸 **Live run — Data Agent answering in natural language.** The `Contoso Banque Churn Agent` correctly reports an overall churn rate of **~23.3%** and identifies the **Inactive** activity tier as the highest-risk segment (**~42.6%**).
+>
+> ![Data Agent answering a business question](assets/08_data_agent_question.png)
 
 ---
 
