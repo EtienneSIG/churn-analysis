@@ -744,6 +744,10 @@ When Fabric generates the semantic model it auto-detects **some** relationships,
 > - The `transactions → customers` link is redundant with the `transactions → accounts → customers` path. Keep only one **active** path to avoid an ambiguous filter; Power BI marks the extra relationship **inactive** (dashed line) — that is expected.
 > - Once relationships exist, a slicer on `customers` (e.g., `region`, `income_band`) or on `customer_custom_segment` (`custom_segment`) will correctly filter visuals built on `customer_360`, `accounts`, and `transactions`.
 
+> 📸 **Live run — semantic model relationships.** The **Model view** of `ChurnAnalysis_SemanticModel` showing all 8 tables and their relationships, including the `customer_custom_segment` → `customer_360` (1:1, cross-filter Both) link created in this step.
+>
+> ![Semantic model relationships](assets/10_semantic_model.png)
+
 ### 7.3 Open Power BI Report Builder
 
 1. From the semantic model, click **Create a report** → **Auto-create report** (to get a starting point) or **Blank report** (to build from scratch).

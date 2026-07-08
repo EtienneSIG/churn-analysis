@@ -28,6 +28,7 @@ Real `.png` screenshots captured during a live end-to-end run of the workshop (F
 | [`07_powerbi_report.png`](07_powerbi_report.png) | ✅ Captured | Power BI churn visualization (Explore this data) |
 | [`08_data_agent_question.png`](08_data_agent_question.png) | ✅ Captured | Data Agent answering a business question |
 | [`09_onelake_raw_files.svg`](09_onelake_raw_files.svg) | ⏭️ Skipped (OneLake Explorer) | OneLake Explorer showing Files/churn/raw/ after ingestion |
+| [`10_semantic_model.png`](10_semantic_model.png) | ✅ Captured | Semantic model Model view — 8 tables + relationships (incl. customer_custom_segment → customer_360) |
 
 When replacing a placeholder with a real screenshot:
 1. Capture the screenshot as a `.png`.
