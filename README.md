@@ -18,13 +18,13 @@
 9. [Step 2 — Install and Configure OneLake Explorer](#step-2--install-and-configure-onelake-explorer)
 10. [Step 3 — Explore OneLake Navigation](#step-3--explore-onelake-navigation)
 11. [Step 3.4 — Upload Custom Segmentation CSV](#step-34--upload-custom-segmentation-csv)
-11. [Step 4 — Generate Synthetic Banking Data](#step-4--generate-synthetic-banking-data)
-12. [Step 5 — Transform, Segment, and Analyze Churn](#step-5--transform-segment-and-analyze-churn)
-13. [Step 6 — SQL Analytics Endpoint](#step-6--sql-analytics-endpoint)
-14. [Step 7 — Power BI Visualization](#step-7--power-bi-visualization)
-15. [Step 8 — Fabric Data Agent](#step-8--fabric-data-agent)
-16. [Step 9 — Optional: Rayfin Bonus](#step-9--optional-rayfin-bonus)
-17. [Reference Links](#reference-links)
+12. [Step 4 — Generate Synthetic Banking Data](#step-4--generate-synthetic-banking-data)
+13. [Step 5 — Transform, Segment, and Analyze Churn](#step-5--transform-segment-and-analyze-churn)
+14. [Step 6 — SQL Analytics Endpoint](#step-6--sql-analytics-endpoint)
+15. [Step 7 — Power BI Visualization](#step-7--power-bi-visualization)
+16. [Step 8 — Fabric Data Agent](#step-8--fabric-data-agent)
+17. [Step 9 — Optional: Rayfin Bonus](#step-9--optional-rayfin-bonus)
+18. [Reference Links](#reference-links)
 
 ---
 
