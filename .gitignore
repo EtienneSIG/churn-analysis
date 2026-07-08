@@ -11,6 +11,9 @@ env/
 *.parquet
 *.xlsx
 
+# Workshop enrichment file — tracked on purpose (uploaded via OneLake Explorer)
+!data/customer_custom_segment.csv
+
 # OS / IDE
 .DS_Store
 .vscode/
