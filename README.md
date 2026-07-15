@@ -1,4 +1,4 @@
-# Customer Churn Analysis — Microsoft Fabric Workshop
+# Customer Churn Analysis — Microsoft Fabric & Foundry Workshop
 
 > **Fictional scenario — Contoso Banque**
 > All data, customer names, account numbers, and figures used in this workshop are entirely synthetic and fictional. They do not represent any real bank, customer, or financial institution. "Contoso Banque" is a fictional entity used for educational purposes only.
@@ -14,6 +14,9 @@
 5. [Workshop Flow and Timing](#5-workshop-flow-and-timing)
 6. [Repository Structure](#6-repository-structure)
 7. [Architecture](#7-architecture)
+
+**Part 1 — Microsoft Fabric**
+
 8. [Step 1 — Create the Fabric Workspace and Lakehouse](#step-1--create-the-fabric-workspace-and-lakehouse)
 9. [Step 2 — Install and Configure OneLake Explorer](#step-2--install-and-configure-onelake-explorer)
 10. [Step 3 — Explore OneLake Navigation](#step-3--explore-onelake-navigation)
@@ -24,13 +27,22 @@
 15. [Step 7 — Power BI Visualization](#step-7--power-bi-visualization)
 16. [Step 8 — Fabric Data Agent](#step-8--fabric-data-agent)
 17. [Step 9 — Optional: Rayfin Bonus](#step-9--optional-rayfin-bonus)
-18. [Reference Links](#reference-links)
+
+**Part 2 — Microsoft Foundry**
+
+18. [Step 10 — Create a Microsoft Foundry Project](#step-10--create-a-microsoft-foundry-project)
+19. [Step 11 — Deploy a Model](#step-11--deploy-a-model)
+20. [Step 12 — Create the Fabric Connection](#step-12--create-the-fabric-connection)
+21. [Step 13 — Create the Agent (Notebook)](#step-13--create-the-agent-notebook)
+22. [Step 14 — Test the Agent in the Portal](#step-14--test-the-agent-in-the-portal)
+23. [Step 15 — Evaluate the Agent in the Portal](#step-15--evaluate-the-agent-in-the-portal)
+24. [Reference Links](#reference-links)
 
 ---
 
 ## 1. Workshop Overview
 
-Welcome to the **Contoso Banque Customer Churn Analysis** workshop, a hands-on lab built entirely on **Microsoft Fabric**.
+Welcome to the **Contoso Banque Customer Churn Analysis** workshop, a hands-on lab built on **Microsoft Fabric** (Part 1) and **Microsoft Foundry** (Part 2).
 
 ### Business Scenario
 
@@ -58,6 +70,8 @@ Fabric Lakehouse (OneLake)
 Curated Delta tables (customer_360, churn_by_segment)
         ↓
 Power BI Report  +  Fabric Data Agent
+        ↓
+Microsoft Foundry Agent (Fabric + Web Search + Code Interpreter)
 ```
 
 ### Key Concepts
@@ -121,6 +135,12 @@ By the end of this workshop, you will be able to:
 - You must have **read access** to the Lakehouse or semantic model you want to use as a data source.
 - Data Agent may not be available in all regions or capacity SKUs at the time of this workshop — check the [Fabric roadmap](https://aka.ms/fabricroadmap) for availability.
 
+### For Microsoft Foundry (Part 2)
+
+- Access to [ai.azure.com](https://ai.azure.com) with the **same organizational account** used for Fabric.
+- Python 3.10+ and the SDK: `pip install "azure-ai-projects>=2.0.0" azure-identity openai`.
+- A **published** Fabric Data Agent (Step 8) — the Foundry agent grounds its internal answers on it.
+
 ### For Rayfin (Optional — Step 9)
 
 - **Node.js 18+** and **npm** installed on your machine.
@@ -147,7 +167,11 @@ By the end of this workshop, you will be able to:
 | 6 | SQL Analytics | Write and run descriptive SQL queries + custom segment cross-analysis | 20 min | Query results confirming churn KPIs by segment |
 | 7 | Power BI | Build report from Lakehouse data | 25 min | Interactive churn dashboard |
 | 8 | Data Agent | Configure agent, ask 5+ business questions incl. custom segments | 20 min | Natural-language answers from data |
-| — | **Total core** | | **~2h 55min** | |
+| 10–12 | Foundry setup | Create project, deploy `gpt-5.4`, create Fabric connection | 25 min | Foundry project + connection ready |
+| 13 | Foundry agent | Create the agent (3 tools) via notebook `04` | 15 min | `ContosoChurnAdvisor` created |
+| 14 | Foundry test | Test in the portal playground | 15 min | Verified multi-tool responses |
+| 15 | Foundry eval | Evaluate the agent in the portal (dataset `churn_agent_eval.jsonl`) | 15 min | Quality metrics in Foundry |
+| — | **Total core** | | **~4h 05min** | |
 | 9 | Rayfin (bonus) | Explore Rayfin as advanced AI layer | 30–45 min | Rayfin connected to Lakehouse (optional) |
 
 ---
@@ -162,7 +186,8 @@ churn-analysis/
 ├── notebooks/
 │   ├── 01_generate_and_ingest_banking_data.ipynb   ← Generate synthetic data & write Delta tables
 │   ├── 02_transform_segment_analyze_churn.ipynb    ← Build customer_360 & churn_by_segment
-│   └── 03_data_agent_validation_questions.md       ← Sample questions for the Data Agent
+│   ├── 03_data_agent_validation_questions.md       ← Sample questions for the Data Agent
+│   └── 04_foundry_agent_pro_code.ipynb             ← Part 2 — create the Foundry agent (3 tools) by code
 │
 ├── sql/
 │   ├── 01_customer_churn_views.sql    ← Create SQL views for churn analysis
@@ -180,7 +205,8 @@ churn-analysis/
 │
 ├── data/
 │   ├── README.md                     ← Explains the data model and schema
-│   └── customer_custom_segment.csv   ← Custom business segmentation (10,000 rows — upload via OneLake Explorer)
+│   ├── customer_custom_segment.csv   ← Custom business segmentation (10,000 rows — upload via OneLake Explorer)
+│   └── churn_agent_eval.jsonl        ← Part 2 — evaluation test set (upload to Foundry as a dataset)
 │
 ├── assets/
 │   ├── README.md                     ← Asset guide — screenshots and diagram instructions
@@ -273,6 +299,12 @@ One of the most important concepts in a Fabric Lakehouse is the distinction betw
 | **Analogy** | A shared network drive | A database table |
 
 **In this workshop:** Raw generated data is written first to `Files/churn/raw/` (staging), then also saved as proper Delta tables under `Tables/` so that Power BI and the Data Agent can query them directly.
+
+---
+
+# Part 1 — Microsoft Fabric
+
+Build the analytics foundation on Microsoft Fabric: generate synthetic data, curate Delta tables, analyse churn, visualise it in Power BI, and expose a natural-language **Fabric Data Agent**.
 
 ---
 
@@ -854,6 +886,190 @@ See [`docs/rayfin_optional.md`](docs/rayfin_optional.md) for installation and co
 
 ---
 
+# Part 2 — Microsoft Foundry
+
+Part 1 built the Fabric foundation and a **published Fabric Data Agent**. In Part 2 you create an **AI agent in Microsoft Foundry** — the **Contoso Churn Advisor** — **by code**, using [`notebooks/04_foundry_agent_pro_code.ipynb`](notebooks/04_foundry_agent_pro_code.ipynb). It combines three tools:
+
+```
+Contoso Churn Advisor (Microsoft Foundry)
+├── 🔵 Fabric Data Agent  → internal churn data (single source of truth)
+├── 🌐 Web Search         → external benchmarks & retention strategies
+└── 🧮 Code Interpreter   → calculations, what-if simulations, charts
+```
+
+### What You Do in Part 2
+
+| Step | What | Where |
+|---|---|---|
+| 10 | Create the Foundry project | Portal |
+| 11 | Deploy a model (`gpt-5.4`) | Portal |
+| 12 | Create the Fabric connection (`ChurnFabricConnection`) | Portal |
+| 13 | Create the agent with its 3 tools | **Notebook** |
+| 14 | Test the agent | Portal playground |
+| 15 | Evaluate the agent (quality metrics) | **Portal** |
+
+Once created by the notebook, the agent is tested interactively in the **Foundry portal playground**.
+
+---
+
+## Step 10 — Create a Microsoft Foundry Project
+
+1. Open [ai.azure.com](https://ai.azure.com) and sign in with the same account used for Fabric.
+2. Click **+ Create project**.
+3. Set:
+   - **Project name:** `contoso-churn-foundry`
+   - **Subscription / Resource group:** the same subscription used for your Fabric capacity.
+   - **Region:** same region as your Fabric capacity (e.g. `West US 3`).
+4. Click **Create** and wait for provisioning.
+
+Copy the project **endpoint** (Project → **Overview** → **Libraries** → **Foundry**) — you paste it into the notebook as `PROJECT_ENDPOINT`.
+
+---
+
+## Step 11 — Deploy a Model
+
+1. In the project, go to **Models** (Model catalog).
+2. Deploy **`gpt-5.4`** with deployment name `gpt-5.4` (Global Standard).
+
+> 💡 **Use a full model, not a "mini".** The agent model orchestrates the multi-tool routing (Fabric → Web → Code Interpreter). Mini models are unreliable at chaining several tools; `gpt-5.4` routes them reliably.
+
+The deployment name is used in the notebook as `MODEL_DEPLOYMENT`.
+
+---
+
+## Step 12 — Create the Fabric Connection
+
+The Fabric Data Agent tool needs a Foundry **connection** that stores your published Data Agent's identifiers. The notebook resolves it **by name** (`FABRIC_CONNECTION_NAME`).
+
+### 12.1 Collect the IDs
+
+Open your **published** Fabric Data Agent (from Step 8) and copy from its URL:
+- **Workspace ID** — `.../groups/<WORKSPACE_ID>/...`
+- **Artifact ID** — `.../aiskills/<ARTIFACT_ID>...`
+
+### 12.2 Create the connection (Custom Keys)
+
+1. In the project, open **Management center** → **Connected resources** → **+ New connection**.
+2. **Auth Type:** **Custom Keys**.
+3. Add two keys (both **Is Secret**):
+   - `workspace-id` → your Workspace ID
+   - `artifact-id` → your Artifact ID
+4. **Connection Name:** `ChurnFabricConnection`.
+5. Click **Connect**.
+
+> 💡 The name must match `FABRIC_CONNECTION_NAME = "ChurnFabricConnection"` in the notebook.
+
+---
+
+## Step 13 — Create the Agent (Notebook)
+
+Open [`notebooks/04_foundry_agent_pro_code.ipynb`](notebooks/04_foundry_agent_pro_code.ipynb) and run the cells in order:
+
+| Cell | What it does |
+|---|---|
+| 1 | Install `azure-ai-projects` 2.x (then restart the kernel) |
+| 2 | Configure the client (`PROJECT_ENDPOINT`, `MODEL_DEPLOYMENT`, `FABRIC_CONNECTION_NAME`) |
+| 3 | Define the tools — one cell each: **Fabric**, **Web Search**, **Code Interpreter** |
+| 4 | Assemble the tools and create the agent (`create_version` + `PromptAgentDefinition`) |
+| 5 | Cleanup — delete the agent version (optional) |
+
+The agent is created with the name **`ContosoChurnAdvisor`** and the three tools attached. Re-running cell 4 creates a **new version**.
+
+---
+
+## Step 14 — Test the Agent in the Portal
+
+Once the agent has been created by the notebook (Step 13), test it interactively:
+
+1. Open [ai.azure.com](https://ai.azure.com) → your project → **Agents** → **`ContosoChurnAdvisor`**.
+2. Select the **latest version** and open the **Playground**.
+3. Ask the questions below, then open **Traces** to confirm the expected tools were called.
+
+### Data — Fabric Data Agent
+
+| Question | Expected tool |
+|---|---|
+| *"What is our overall churn rate?"* | Fabric |
+| *"Which activity tier has the highest churn rate?"* | Fabric |
+| *"How many customers are in the VIP custom segment?"* | Fabric |
+
+### Market — Web Search
+
+| Question | Expected tool |
+|---|---|
+| *"What is the average churn rate in European retail banking?"* | Web Search |
+| *"What retention strategies do banks use for inactive customers?"* | Web Search |
+
+### Computation — Code Interpreter
+
+| Question | Expected tool |
+|---|---|
+| *"If we cut Inactive churn from 42% to 25%, how many customers do we save?"* | Fabric → Code Interpreter |
+| *"Chart our churn rate by activity tier."* | Fabric → Code Interpreter |
+
+### Multi-tool
+
+| Question | Expected tools |
+|---|---|
+| *"How does our churn compare to the industry, and chart it?"* | Fabric → Web Search → Code Interpreter |
+
+> 💡 If a data question skips Fabric or routes to Web Search instead, confirm the agent runs on **`gpt-5.4`** (not a mini). Mini models are unreliable at chaining tools. You can switch the model in the playground **Model** dropdown and **Save**.
+
+---
+
+## Step 15 — Evaluate the Agent in the Portal
+
+Systematic evaluation measures **how well** the agent answers across a consistent question set. You'll do it in the **Foundry portal** (no code): upload a test dataset, run an evaluation against the agent, and review the scores.
+
+### 15.1 Upload the test dataset
+
+The repo includes a ready-made test set as **JSONL** — the format required by the **Existing dataset** evaluation flow: [`data/churn_agent_eval.jsonl`](data/churn_agent_eval.jsonl) — 11 questions. Fields follow the Foundry [agent-evaluation field mapping](https://learn.microsoft.com/azure/foundry/observability/how-to/evaluate-agent): `query` (the input), `ground_truth` (reference answer for Similarity), and `expected_actions` (the ordered tool list for **Task Navigation Efficiency**, incl. the full Fabric → Web → Code Interpreter case). `expected_primary_tool` and `tool_rule` are human-readable helpers for reviewing **Traces**.
+
+1. Open [ai.azure.com](https://ai.azure.com) → your project → **Evaluations** (or **Data + indexes** → **Datasets**).
+2. **+ New dataset** → **Upload files** → select `data/churn_agent_eval.jsonl`.
+3. Name it `churn-advisor-eval` and save.
+
+### 15.2 Create an evaluation
+
+1. Go to **Evaluations** → **+ New evaluation**.
+2. Choose **Evaluate an agent** and select **`ContosoChurnAdvisor`** (latest version) as the target.
+3. **Data source:** the `churn-advisor-eval` dataset you just uploaded.
+4. **Column / field mapping** (uses the documented `{{item.*}}` and `{{sample.*}}` template syntax):
+   - `query` → `{{item.query}}` (the input sent to the agent).
+   - `ground_truth` → `{{item.ground_truth}}` (reference answer, for Similarity).
+   - `expected_actions` → `{{item.expected_actions}}` (the ground-truth tool sequence, for Task Navigation Efficiency).
+   - The agent's response is provided automatically as `{{sample.output_items}}` (full output **including tool calls** — use this for the agent/tool evaluators) or `{{sample.output_text}}` (plain text only — use this for text-quality evaluators).
+   - `expected_primary_tool` and `tool_rule` aren't mapped to an evaluator — keep them to eyeball the **Traces** for each row.
+
+### 15.3 Select evaluators
+
+Use the [built-in agent evaluators](https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/agent-evaluators), judge model `gpt-5.4`:
+
+| Evaluator | Measures | Response mapping |
+|---|---|---|
+| **Task Adherence** | Followed its routing rules (Fabric for internal, etc.) | `{{sample.output_items}}` |
+| **Intent Resolution** | Understood the request | `{{sample.output_items}}` |
+| **Task Completion** | Produced a usable answer | `{{sample.output_text}}` |
+| **Coherence** | Logical, well-structured | `{{sample.output_text}}` |
+
+
+### 15.4 Run and review
+
+1. **Run** and wait for completion.
+2. Review the aggregate scores:
+
+| Metric | Target | If low… |
+|---|---|---|
+| Task Adherence | pass | Ignored routing rules — e.g. answered internal data without Fabric. |
+| Intent Resolution | pass | Missed the user's intent. |
+| Task Completion | pass | Answer incomplete — often a multi-tool/chart row. |
+| Coherence | ≥ 4 / 5 | Disorganised responses. |
+
+3. Sort by lowest score and open **Traces** to confirm the tool sequence matches `expected_actions`.
+4. **Iterate:** adjust the routing instructions in Step 13, create a new agent version, re-run.
+
+---
+
 ## Reference Links
 
 | Resource | Link |
@@ -864,6 +1080,9 @@ See [`docs/rayfin_optional.md`](docs/rayfin_optional.md) for installation and co
 | Load data into Fabric Lakehouse notebooks | [https://learn.microsoft.com/fabric/data-engineering/lakehouse-notebook-load-data](https://learn.microsoft.com/fabric/data-engineering/lakehouse-notebook-load-data) |
 | Microsoft Fabric churn prediction tutorial | [https://learn.microsoft.com/fabric/data-science/customer-churn](https://learn.microsoft.com/fabric/data-science/customer-churn) |
 | Fabric Data Agent documentation | [https://learn.microsoft.com/fabric/data-science/data-agent-overview](https://learn.microsoft.com/fabric/data-science/data-agent-overview) |
+| Microsoft Foundry | [https://ai.azure.com](https://ai.azure.com) |
+| Fabric data agent tool (Foundry) | [https://learn.microsoft.com/azure/foundry/agents/how-to/tools/fabric](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/fabric) |
+| Azure AI Projects SDK (Python) | [https://learn.microsoft.com/python/api/overview/azure/ai-projects-readme](https://learn.microsoft.com/python/api/overview/azure/ai-projects-readme) |
 | SQL analytics endpoint overview | [https://learn.microsoft.com/fabric/data-engineering/lakehouse-sql-analytics-endpoint](https://learn.microsoft.com/fabric/data-engineering/lakehouse-sql-analytics-endpoint) |
 | Build Power BI reports in Fabric | [https://learn.microsoft.com/power-bi/create-reports/create-report-fabric](https://learn.microsoft.com/power-bi/create-reports/create-report-fabric) |
 | Rayfin GitHub repository | [https://github.com/microsoft/rayfin](https://github.com/microsoft/rayfin) |

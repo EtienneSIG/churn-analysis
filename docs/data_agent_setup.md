@@ -181,7 +181,31 @@ Click **"View query"** or **"Show SQL"** next to any answer to see the generated
 
 ---
 
-## Step 6 — Share the Agent (Optional)
+## Step 6 — Publish the Data Agent
+
+The Data Agent must be **published** before it can be consumed by other tools — including the **Microsoft Foundry** agent in Part 2. An unpublished (draft) agent is not visible as a data source in Foundry.
+
+1. In the Data Agent editor, click **Publish** (top-right).
+2. In the **Publish data agent** dialog, confirm the **Name** (e.g., `Contoso Churn Analysis Agent`).
+3. In **Description of purpose and capabilities**, paste the following:
+
+```
+Answers natural-language questions about Contoso Banque customer churn. It queries the ChurnAnalysisLH Lakehouse (customer_360, churn_by_segment, customer_custom_segment, customers, accounts) to report churn rates, customer counts, and segment breakdowns by activity tier, balance band, product-count tier, digital activity, region, and custom CRM segments (VIP, Loyal, At Risk, New Joiner, Dormant). Use it for questions like "What is the overall churn rate?", "Which activity tier has the highest churn?", or "Compare churn between VIP and At Risk customers." All data is synthetic and used for a learning workshop; monetary amounts are in EUR.
+```
+
+4. Leave **Also publish to the Agent Store in Microsoft 365 Copilot** set to **Off** (not needed for this workshop).
+5. Click **Publish**.
+
+> 💡 **Why publish?** Publishing creates a stable, shareable version of the agent and exposes it to downstream consumers. In Part 2, the Foundry agent connects to this **published** Data Agent using its workspace ID and artifact ID (see the **Microsoft Foundry** part of the main [`README.md`](../README.md#step-12--create-the-fabric-connection)).
+
+### 6.1 Validate
+
+- The agent item shows a **Published** status in the workspace.
+- Re-running a test question still returns the expected answer.
+
+---
+
+## Step 7 — Share the Agent (Optional)
 
 1. In the Fabric workspace, find the **Contoso Banque Churn Agent** item.
 2. Click the **...** menu → **Share**.

@@ -157,8 +157,7 @@ SELECT
     ROUND(100.0 * SUM(churned_90d) / COUNT(*), 2)         AS churn_rate_pct,
     ROUND(AVG(avg_balance_90d), 2)                        AS avg_balance_eur
 FROM customer_360
-GROUP BY region
-ORDER BY churn_rate_pct DESC;
+GROUP BY region;
 
 GO
 

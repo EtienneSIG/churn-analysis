@@ -13,3 +13,8 @@ pandas>=2.0.0
 
 # Testing
 pytest>=7.4.0
+
+# Microsoft Foundry — Part 2 (notebook 04: create the agent by code)
+azure-ai-projects>=2.2.0
+azure-identity>=1.17.0
+openai>=1.50.0
