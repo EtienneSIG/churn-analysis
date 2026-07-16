@@ -110,6 +110,7 @@ By the end of this workshop, you will be able to:
 - [ ] Transform raw banking data into customer-level analytical features.
 - [ ] Apply **segmentation logic** based on activity, balance, and product count.
 - [ ] Calculate **churn KPIs** (churn rate, churned count) by segment.
+- [ ] Produce **in-notebook churn visualizations** (distributions, segment bar charts, heatmap) with matplotlib/seaborn.
 - [ ] Build a **Power BI report** directly from Fabric Lakehouse data.
 - [ ] Configure a **Fabric Data Agent** and ask business questions in natural language.
 - [ ] Understand where **Rayfin** could fit as an advanced bonus capability.
@@ -674,6 +675,25 @@ After running the notebook, `churn_by_segment` contains:
 > 📸 **Live run — notebook 02 complete.** The transformation notebook builds the curated `customer_360` and `churn_by_segment` tables after a successful **Run all**.
 >
 > ![Notebook 02 Run All complete](assets/05_notebook_02_run_all.png)
+
+### 5.6 In-Notebook Churn Visualizations
+
+Beyond writing the curated tables, the notebook now includes a final **visualization section** that illustrates the churn analysis directly inside the notebook — complementing the Power BI report (Step 7). The Spark DataFrames are converted to pandas (small aggregated volumes) and plotted with **matplotlib** / **seaborn** (the code falls back to pure matplotlib if seaborn is unavailable).
+
+The section produces the following charts:
+
+| Visualization | Type | What it shows |
+|---|---|---|
+| **Overall churn rate** | Donut chart | Share of retained vs. churned customers, with the global churn rate at the center |
+| **Churn rate by segment** | 4 bar charts | Churn rate per segment across the 4 dimensions (activity tier, balance band, product count, income band), with a global-average reference line |
+| **Feature distributions** | Histograms + KDE | Distribution of key variables (avg balance 90d, transaction count 90d, tenure, age) for churned vs. retained customers |
+| **Feature comparison** | Boxplots | Side-by-side comparison of the same key variables by churn status |
+| **Activity × Balance heatmap** | Heatmap | Cross-tabulated churn rate combining activity tier and balance band |
+| **Churn by region** | Horizontal bar chart | Churn rate per region with customer counts and a global-average reference line |
+
+> **Palette:** Contoso Banque colors — green = retained, red = churned.
+>
+> These charts give a quick, self-contained visual read of the churn drivers before (or without) opening Power BI.
 
 ---
 
