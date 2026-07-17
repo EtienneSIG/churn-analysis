@@ -244,45 +244,6 @@ churn-analysis/
 
 ### End-to-End Data Flow
 
-```
-┌─────────────────────────────────────────┐
-│  Fabric Notebook (PySpark)              │
-│  Synthetic banking data generation      │
-│  notebook: 01_generate_and_ingest...    │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  OneLake / Lakehouse: ChurnAnalysisLH   │
-│                                         │
-│  Files/churn/raw/                       │
-│    ├── customers  (Parquet/Delta)       │
-│    ├── accounts                         │
-│    ├── products                         │
-│    ├── customer_products                │
-│    └── transactions                     │
-│                                         │
-│  Tables/  (Delta tables)                │
-│    ├── customers                        │
-│    ├── accounts                         │
-│    ├── products                         │
-│    ├── customer_products                │
-│    ├── transactions                     │
-│    ├── customer_360     ◄── notebook 02 │
-│    ├── churn_by_segment ◄── notebook 02 │
-│    └── customer_custom_segment ◄── OneLake Explorer upload │
-└────────┬─────────────────────────────────┘
-         │
-         ├──────────────────────────────────►  SQL Analytics Endpoint
-         │                                     (sql/ scripts)
-         │
-         ├──────────────────────────────────►  Power BI Semantic Model
-         │                                     (powerbi/ guide)
-         │
-         └──────────────────────────────────►  Fabric Data Agent
-                                               (docs/data_agent_setup.md)
-```
-
 ![Architecture Diagram](assets/architecture_diagram.svg)
 
 ### Files vs Tables — Beginner Explanation
